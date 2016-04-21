@@ -1,0 +1,35 @@
+{
+  "name": "remerger",
+  "version": "0.1.1",
+  "description": "Creates memoizing deep merge functions for use with react-redux connect",
+  "main": "index.js",
+  "homepage": "https://github.com/frankwallis/remerger",
+  "authors": [
+    "Frank Wallis"
+  ],
+  "keywords": [
+    "memoize",
+    "merge",
+    "redux",
+    "react",
+    "connect"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frankwallis/remerger.git"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.3.5",
+    "memoizee": "^0.3.10"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.2.5"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "test": "mocha --harmony --harmony-destructuring --harmony_default_parameters ./test.js"
+  },
+  "bin": {},
+  "license": "MIT"
+}
