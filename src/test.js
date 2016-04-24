@@ -159,4 +159,40 @@ describe('remerge', () => {
       expect(merged1.animals.aardvark).to.not.equal(merged2.animals.aardvark);
       expect(merged1.animals.zebra).to.be.equal(merged2.animals.zebra);
    });
+   
+   it('handles undefined values', () => {
+      const merged = remerge(undefined, undefined);
+      expect(merged).to.deep.equal({});
+   });
+
+   it('handles arrays', () => {
+      const state = {
+         arr1: ['aardvark', 'antelope'],
+         arr2: ['zebra', 'zebu']
+      };
+      const actions = {
+         feed: () => console.log('yum'),
+         groom: () => console.log('neigh')
+      }
+      const merged = remerge(state, actions);
+      expect(merged.arr1).to.equal(state.arr1);
+      expect(merged.arr2).to.equal(state.arr2);
+      expect(merged.feed).to.equal(actions.feed);
+      expect(merged.groom).to.equal(actions.groom);
+   });
+
+   it('if conflicting values are not objects, action wins', () => {
+      const state = {
+         prop1: ['aardvark', 'antelope'],
+         prop2: 'zebra'
+      };
+      const actions = {
+         prop1: () => console.log('yum'),
+         prop2: () => console.log('neigh')
+      }
+      const merged = remerge(state, actions);
+      expect(merged.prop1).to.equal(actions.prop1);
+      expect(merged.prop2).to.equal(actions.prop2);
+   });
+   
 });

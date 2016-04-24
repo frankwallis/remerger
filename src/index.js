@@ -1,5 +1,5 @@
 import * as _mergeWith from 'lodash/mergeWith'
-import * as _isObject from 'lodash/isObject'
+import * as _isPlainObject from 'lodash/isPlainObject'
 import * as _isUndefined from 'lodash/isUndefined'
 import * as _memoize from 'memoizee'
 
@@ -17,7 +17,7 @@ function createMerger() {
       else if (_isUndefined(actions)) {
          return state
       }
-      else if (_isObject(state) && _isObject(actions)) {
+      else if (_isPlainObject(state) && _isPlainObject(actions)) {
          return memoizedMerge(state, actions)
       }
       else {
