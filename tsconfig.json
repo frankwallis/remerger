@@ -1,0 +1,14 @@
+{
+   "compileOnSave": true,
+   "compilerOptions": {
+      "module": "commonjs",
+      "target": "es5",
+      "moduleResolution": "node",
+      "outDir": "lib",
+      "allowJs": true
+   },
+   "files": [
+      "src/index.js",
+      "src/test.js"
+   ]
+}
