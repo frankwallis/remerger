@@ -4,11 +4,11 @@ import * as _isUndefined from 'lodash/isUndefined'
 import * as _memoize from 'memoizee'
 
 function createMerger() {
-   function merge(state, actions) {
-      return _mergeWith({}, state, actions, customizer)
+   function merge(...args) {
+      return _mergeWith({}, ...args, customizer)
    }
 
-   const memoizedMerge = _memoize(merge)
+   const memoizedMerge = _memoize(merge, { length: 3 })
 
    function customizer(state, actions, key, object, source, stack) {
       if (_isUndefined(state)) {

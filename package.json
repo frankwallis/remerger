@@ -1,6 +1,6 @@
 {
   "name": "remerger",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Create memoizing deep merge functions for use with react-redux connect",
   "jsnext:main": "src/index.js",
   "main": "lib/index.js",

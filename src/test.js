@@ -3,7 +3,7 @@ const createMerger = require('./index');
 const remerge = createMerger();
 
 describe('remerge', () => {
-   it('merges state and actions', () => {
+   it('merges state, actions and props', () => {
       const state = {
          prop1: 'aardvark',
          prop2: 'zebra'
@@ -12,11 +12,17 @@ describe('remerge', () => {
          feed: () => console.log('yum'),
          groom: () => console.log('neigh')
       }
-      const merged = remerge(state, actions);
+      const props = {
+         display: 'list',
+         items: 10
+      }
+      const merged = remerge(state, actions, props);
       expect(merged.prop1).to.equal(state.prop1);
       expect(merged.prop2).to.equal(state.prop2);
       expect(merged.feed).to.equal(actions.feed);
       expect(merged.groom).to.equal(actions.groom);
+      expect(merged.display).to.equal(props.display);
+      expect(merged.items).to.equal(props.items);
    });
 
    it('returns the same object when inputs are unchanged', () => {
@@ -28,12 +34,16 @@ describe('remerge', () => {
          feed: () => console.log('yum'),
          groom: () => console.log('neigh')
       }
-      const merged1 = remerge(state, actions);
-      const merged2 = remerge(state, actions);      
+      const props = {
+         display: 'list',
+         items: 10
+      }
+      const merged1 = remerge(state, actions, props);
+      const merged2 = remerge(state, actions, props);      
       expect(merged1).to.equal(merged2);      
    });
    
-   it('returns different object when inputs are changed', () => {
+   it('returns different object when actions are changed', () => {
       const state = {
          prop1: 'aardvark',
          prop2: 'zebra'
@@ -46,8 +56,12 @@ describe('remerge', () => {
          feed: () => console.log('yuk'),
          groom: () => console.log('grrr')
       };
-      const merged1 = remerge(state, actions);
-      const merged2 = remerge(state, actions2);
+      const props = {
+         display: 'list',
+         items: 10
+      }
+      const merged1 = remerge(state, actions, props);
+      const merged2 = remerge(state, actions2, props);
       expect(merged1).to.not.equal(merged2);
    });
 
@@ -68,14 +82,24 @@ describe('remerge', () => {
             groom: () => console.log('neigh')   
          }                 
       }
-      const merged1 = remerge(state, actions);
-      const merged2 = remerge(state, actions);      
+      const props = {
+         aardvark: {
+            display: 'list'
+         },
+         zebra: {
+            display: 'grid'
+         }
+      }
+      const merged1 = remerge(state, actions, props);
+      const merged2 = remerge(state, actions, props);      
       expect(merged1).to.equal(merged2);
       
       expect(merged1.aardvark.color).to.be.equal(state.aardvark.color);
       expect(merged1.aardvark.feed).to.be.equal(actions.aardvark.feed);
+      expect(merged1.aardvark.display).to.be.equal(props.aardvark.display);
       expect(merged1.zebra.color).to.be.equal(state.zebra.color);    
       expect(merged1.aardvark.groom).to.be.equal(actions.aardvark.groom);
+      expect(merged1.zebra.display).to.be.equal(props.zebra.display);
    });
 
    it('does not modify original objects', () => {
@@ -91,6 +115,33 @@ describe('remerge', () => {
       Object.freeze(actions);
       const merged1 = remerge(state, actions);
       expect(merged1).to.not.equal(state);   
+   });
+
+   it('does not modify original objects when nested', () => {
+      const state = {
+         aardvark: {
+            color: 'brown'
+         },
+         zebra: {
+            color: 'stripey'
+         }        
+      };
+      const actions = {
+         aardvark: {
+            feed: () => console.log('yum'),   
+         },
+         zebra: {
+            groom: () => console.log('neigh')   
+         }                 
+      }
+      Object.freeze(state);
+      Object.freeze(actions);
+      const merged = remerge(state, actions);
+      expect(merged).to.not.equal(state);   
+      expect(merged.aardvark).to.not.equal(state.aardvark);
+      expect(merged.zebra).to.not.equal(state.zebra);   
+      expect(merged.aardvark).to.not.equal(actions.aardvark);
+      expect(merged.zebra).to.not.equal(actions.zebra);   
    });
 
    it('returns same object for 1st level nested parts of the merged object which are unchanged', () => {
@@ -116,8 +167,16 @@ describe('remerge', () => {
          },
          zebra: actions.zebra
       }
-      const merged1 = remerge(state, actions);
-      const merged2 = remerge(state, actions2);      
+      const props = {
+         aardvark: {
+            display: 'list'
+         },
+         zebra: {
+            display: 'grid'
+         }
+      }
+      const merged1 = remerge(state, actions, props);
+      const merged2 = remerge(state, actions2, props);      
       expect(merged1).to.not.equal(merged2);
       expect(merged1.aardvark).to.not.equal(merged2.aardvark);
       expect(merged1.zebra).to.be.equal(merged2.zebra);
@@ -152,8 +211,18 @@ describe('remerge', () => {
             zebra: actions.animals.zebra
          }
       }
-      const merged1 = remerge(state, actions);
-      const merged2 = remerge(state, actions2);      
+      const props = {
+         animals: {
+            aardvark: {
+               display: 'list'
+            },
+            zebra: {
+               display: 'grid'
+            }
+         }
+      }
+      const merged1 = remerge(state, actions, props);
+      const merged2 = remerge(state, actions2, props);      
       expect(merged1).to.not.equal(merged2);
       expect(merged1.animals).to.not.equal(merged2.animals);
       expect(merged1.animals.aardvark).to.not.equal(merged2.animals.aardvark);
@@ -161,7 +230,7 @@ describe('remerge', () => {
    });
    
    it('handles undefined values', () => {
-      const merged = remerge(undefined, undefined);
+      const merged = remerge(undefined, undefined, undefined);
       expect(merged).to.deep.equal({});
    });
 
@@ -181,7 +250,7 @@ describe('remerge', () => {
       expect(merged.groom).to.equal(actions.groom);
    });
 
-   it('if conflicting values are not objects, action wins', () => {
+   it('if conflicting values are not objects, props wins, actions 2nd', () => {
       const state = {
          prop1: ['aardvark', 'antelope'],
          prop2: 'zebra'
@@ -190,8 +259,12 @@ describe('remerge', () => {
          prop1: () => console.log('yum'),
          prop2: () => console.log('neigh')
       }
-      const merged = remerge(state, actions);
-      expect(merged.prop1).to.equal(actions.prop1);
+      const props = {
+         prop1: 10,
+         prop9: 'zebra'
+      };
+      const merged = remerge(state, actions, props);
+      expect(merged.prop1).to.equal(props.prop1);
       expect(merged.prop2).to.equal(actions.prop2);
    });
    
